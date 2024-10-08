@@ -1,56 +1,56 @@
+include /home/eabarmel/.env
 # Define the directory for the Julia environment
-JULIA_DEPOT_PATH := $(shell pwd)/.julenv
+CLI := /storage5/eabarmel/IMRF/cli
+
+ICN_UPDATE_PROJECT_TOML := cp $(ICN_JULIA_DEPOT_PATH)/Project.toml Project.toml
+
+# Custom shell command to add a package from the environment and update Project.toml for ICN
+ICN_ADD_AND_UPDATE := $(ICN_JULIA_BIN) --project=$(ICN_JULIA_DEPOT_PATH) -e 'using Pkg; Pkg.add("$(ARG)");' && $(ICN_UPDATE_PROJECT_TOML)
+
+# Custom shell command to remove a package from the environment and update Project.toml for ICN
+ICN_REMOVE_AND_UPDATE := $(ICN_JULIA_BIN) --project=$(ICN_JULIA_DEPOT_PATH) -e 'using Pkg; Pkg.rm("$(ARG)");' && $(ICN_UPDATE_PROJECT_TOML)
 
 DELETE_SIMULS := rm -rf simulations/*
 
-DELETE_GRAPHS := rm -rf graphs/simulations/* && rm -rf graphs/psd/simulations/* && rm -rf graphs/eigspectra/*
+DELETE_GRAPHS := rm -rf graphs/simulations/* && rm -rf graphs/psd/simulations/*
 
-# Update Project.toml
-UPDATE_PROJECT_TOML := cp $(JULIA_DEPOT_PATH)/Project.toml Project.toml
-
-# Custom shell command to add a package from the environment and update Project.toml
-ADD_AND_UPDATE := julia --project=$(JULIA_DEPOT_PATH) -e 'using Pkg; Pkg.add("$(ARG)");' && $(UPDATE_PROJECT_TOML)
-
-# Custom shell command to remove a package from the environment and update Project.toml
-REMOVE_AND_UPDATE := julia --project=$(JULIA_DEPOT_PATH) -e 'using Pkg; Pkg.rm("$(ARG)");' && $(UPDATE_PROJECT_TOML)
-
-# Target to run Julia commands in the environment
+# Target to run Julia commands in the ICN environment
 julia_env:
-	@julia --project=$(JULIA_DEPOT_PATH) $(ARGS)
+	@$(ICN_JULIA_BIN) --project=$(ICN_JULIA_DEPOT_PATH) $(ARGS)
 
-# Target to add a package to the environment
+# Target to add a package to the ICN environment
 add_to_env:
-	@$(ADD_AND_UPDATE)
+	@$(ICN_ADD_AND_UPDATE)
 
-# Target to remove a package from the environment
+# Target to remove a package from the ICN environment
 rm_from_env:
-	@$(REMOVE_AND_UPDATE)
+	@$(ICN_REMOVE_AND_UPDATE)
 
-# Target to resolve dependencies and instantiate the environment
+# Target to resolve dependencies and instantiate the ICN environment
 instantiate:
-	@julia --project=$(JULIA_DEPOT_PATH) -e 'using Pkg; Pkg.instantiate()'
-	cp Project.toml $(JULIA_DEPOT_PATH)/Project.toml
-	@julia --project=$(JULIA_DEPOT_PATH) -e 'using Pkg; Pkg.resolve(); Pkg.instantiate()'
+	@$(ICN_JULIA_BIN) --project=$(ICN_JULIA_DEPOT_PATH) 'using Pkg; Pkg.instantiate()'
+	cp Project.toml $(ICN_JULIA_DEPOT_PATH)/Project.toml
+	@$(ICN_JULIA_BIN) --project=$(ICN_JULIA_DEPOT_PATH) -e 'using Pkg; Pkg.resolve(); Pkg.instantiate()'
 
-
-# Target to precompile packages in the environment
+# Target to precompile packages in the ICN environment
 precompile:
-	@julia --project=$(JULIA_DEPOT_PATH) -e 'using Pkg; Pkg.precompile()'
+	@$(ICN_JULIA_BIN) --project=$(ICN_JULIA_DEPOT_PATH) -e 'using Pkg; Pkg.precompile()'
 
-# Target to simulate the RFIM
+# Target to simulate the Ising model
 simulate:
-	@julia --project=$(JULIA_DEPOT_PATH) --threads $(nthreads) cli/simulate.jl $(ngrid) $(runs) $(gens) $(nthreads)
+	@$(ICN_JULIA_BIN) --project=$(ICN_JULIA_DEPOT_PATH) --threads $(nthreads) $(CLI)/simulate.jl $(ngrid) $(runs) $(gens) $(nthreads)
 
-# Target to plot the trazes of the times series
-plot_trazes:
-	@julia --project=$(JULIA_DEPOT_PATH) cli/plot_trazes.jl $(assembled_magn)
+# Target to plot the time series magnetization traces 
+plot_traces:                                                               
+	@$(ICN_JULIA_BIN) --project=$(ICN_JULIA_DEPOT_PATH) $(CLI)/plot_traces.jl $(assembled_magn)
 
-# Target to plot the trazes of the times series
-plot_psd:
-	@julia --project=$(JULIA_DEPOT_PATH) cli/plot_psd.jl 
+# Target to plot the psd of the rfft                                
+plot_psd:                                                           
+	@$(ICN_JULIA_BIN) --project=$(ICN_JULIA_DEPOT_PATH) $(CLI)/plot_psd.jl   
 
+# Target to plot eigspectra 
 plot_eigspectra:
-	@julia --project=$(JULIA_DEPOT_PATH) cli/plot_eigspectra.jl $(realizations) $(patterns)
+	@$(ICN_JULIA_BIN) --project=$(ICN_JULIA_DEPOT_PATH) $(CLI)/plot_eigspectra.jl $(realizations) $(patterns)
 
 # Target to precompile packages in the environment
 cleanup_simulations:
@@ -63,3 +63,4 @@ cleanup:
 	@($(DELETE_GRAPHS) && $(DELETE_SIMULS))
 
 .PHONY: julia_env add_to_env rm_from_env instantiate precompile simulate plot_trazes plot_psd plot_eigspectra cleanup_simulations cleanup_graphs cleanup
+
