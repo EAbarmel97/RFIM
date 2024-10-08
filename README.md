@@ -1,5 +1,5 @@
 # About this repo:
-Julia implementation of the 2D Ising Model. 
+parallel Julia implementation of the 2D Ising Model. 
 
 # To use it without the REPL
  1. Clone the repo.

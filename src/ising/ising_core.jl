@@ -1,12 +1,29 @@
 """
+   do_run(temperature::Float64, 
+          n_grid::Int64, 
+          run::Int64, 
+          num_generations::Int64, 
+          magnetization::Float64, 
+          magnetization_dir::String, 
+          grid_evolution_dir::Union{String,Nothing}; 
+          display_lattice::Bool=false, 
+          flip_strategy::ISING_LATTICE_STRATEGY=random_strategy, 
+          trans_dynamics::ISING_LATTICE_DYNAMICS=metropolis_dynamics
+          )
 
+Simulates the evolution made in one run of an Ising lattice and logs magnetization data 
 
-
-
-
-
-
-
+# Arguments
+- `temperature::Float64`: The temperature of the system.
+- `n_grid::Int64`: The size of the grid (NxN).
+- `run::Int64`: The current simulation run identifier.
+- `num_generations::Int64`: Number of generations to simulate.
+- `magnetization::Float64`: Initial magnetization of the system.
+- `magnetization_dir::String`: Directory to store global magnetization data.
+- `grid_evolution_dir::Union{String,Nothing}`: Directory to store spin grid evolution snapshots, if `display_lattice` is true.
+- `display_lattice::Bool`: Whether to log spin grid states (default is `false`).
+- `flip_strategy::ISING_LATTICE_STRATEGY`: Spin-flipping strategy (default is `random_strategy`).
+- `trans_dynamics::ISING_LATTICE_DYNAMICS`: Transition dynamics for spin updates (default is `metropolis_dynamics`).
 """
 function do_run(
   temperature::Float64,
@@ -65,7 +82,8 @@ end
                    NUM_GENERATIONS::Int64;
                    include_Tc::Bool=false, 
                    display_lattice::Bool=false, 
-                   generate_rffts::Bool=false)
+                   generate_rffts::Bool=false
+                   )
 
 Performs multiple simulation runs on a grid with specified parameters, optionally including a critical temperature, visualizing the lattice, 
 and generating random Fourier transforms.
