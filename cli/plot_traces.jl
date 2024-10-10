@@ -7,7 +7,7 @@ function __plot(plot_ensamble_magnetization::Bool=false)
   IMRF.plot_trazes()
 
   if plot_ensamble_magnetization
-    ensamblated_magnetization_file_path = first(filter((u) -> endswith(u, "ensamblated_magnetization.csv"),
+    ensamblated_magnetization_file_path = first(filter((u) -> endswith(u, "assembled_magnetization.csv"),
       readdir(abspath(IMRF.SIMULATIONS_DIR), join=true)))
 
     IMRF.plot_ensamblated_magnetization(ensamblated_magnetization_file_path, IMRF.GRAPHS_DIR_SIMULATIONS)

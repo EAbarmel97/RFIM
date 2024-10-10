@@ -118,9 +118,8 @@ function do_simulations(
 
   temps_runs_cartesian_prod = Iterators.product(temperatures, 1:NUM_RUNS)
 
-  @sync for (i, temperature_run_pair) in enumerate(temps_runs_cartesian_prod)
+  @sync for (_, (temp, run)) in enumerate(temps_runs_cartesian_prod)
     @spawn begin
-      temp, run = temperature_run_pair
       if temp == CRITICAL_TEMP
         str_temp = __format_str_float(CRITICAL_TEMP, 6)
         aux_dir = create_dir(joinpath(SIMULATIONS_DIR, "simulations_T_"), sub_dir, str_temp)
@@ -145,7 +144,7 @@ function do_simulations(
   end
 
   if write_csv_assembled_magnetization
-    write_csv_ensamblated_magnetization_by_temprature(SIMULATIONS_DIR; statistic=mean)
+    write_csv_assembled_magnetization_by_temprature(SIMULATIONS_DIR; statistic=mean)
   end
 
   if generate_rffts

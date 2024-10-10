@@ -100,7 +100,7 @@ function write_to_csv(file_to_write::String, value::Vector{<:Any})
 end
 
 function write_rffts(num_runs::Int64)
-  #check if ensamblated_magnetization csv exists
+  #check if assembled_magnetization csv exists
   if filter((u) -> endswith(u, ".csv"), readdir(abspath(SIMULATIONS_DIR), join=true)) |> length > 0
     All_SIMULATIONS_DIRS = readdir(abspath(SIMULATIONS_DIR), join=true)[4:end]
   else
@@ -125,7 +125,7 @@ function write_rfft(arr::Vector{ComplexF64}, file_path::String)
   write_to_csv(file_path, arr)
 end
 
-function write_csv_ensamblated_magnetization_by_temprature(write_to::String; statistic::Function=mean)
+function write_csv_assembled_magnetization_by_temprature(write_to::String; statistic::Function=mean)
   #this gets an array of dirs with the structure: ../simulations/simulations_T_xy_abcdefg_/
   All_TEMPERATURES_DIRS = readdir(abspath(SIMULATIONS_DIR), join=true)[3:end]
   All_MAGNETIZATION_DIRS = joinpath.(All_TEMPERATURES_DIRS, "magnetization")
@@ -145,8 +145,8 @@ function write_csv_ensamblated_magnetization_by_temprature(write_to::String; sta
     push!(temperatures, temperature)
   end
 
-  ensamblated_magnetization_file_path = create_file(joinpath(write_to, "$(statistic)_ensamblated_magnetization.csv"))
-  CSV.write(ensamblated_magnetization_file_path, DataFrame(t=temperatures, M_n=magnetizations); append=true, delim=',')
+  assembled_magnetization_file_path = create_file(joinpath(write_to, "$(statistic)_assembled_magnetization.csv"))
+  CSV.write(assembled_magnetization_file_path, DataFrame(t=temperatures, M_n=magnetizations); append=true, delim=',')
 end
 
 function __count_lines_in_csv(file_path::String)
